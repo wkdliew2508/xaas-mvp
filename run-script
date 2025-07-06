@@ -1,0 +1,2 @@
+docker build -t ipo-radar .
+docker run -p 8501:8501 ipo-radar

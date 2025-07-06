@@ -1,0 +1,22 @@
+/project-root
+│
+├── core/                     # Shared logic, reusable modules
+│   ├── scraper.py            # Web scraping interfaces
+│   ├── enricher.py           # Contact enrichment logic
+│   ├── scorer.py             # Lead scoring logic
+│   ├── outreach.py           # Email generation + messaging
+│   ├── utils.py              # Logging, config, error handling
+│
+├── campaigns/                # Project-specific flows
+│   ├── ipo_revival/          # Withdrawn IPO targeting
+│   ├── ifa_singapore/        # MAS-IFA targeting
+│   ├── parabellum_outreach/  # Parabellum expansion
+│   └── cassini_qualification/ # Cassini warm lead mapping
+│
+├── data/                     # Cached scrapes, exports
+│
+├── app.py                    # Entry point / CLI or Streamlit
+├── config.yaml               # Campaign-specific switches
+└── requirements.txt          # Lightweight deps (Playwright, OpenAI, requests)
+
+    
