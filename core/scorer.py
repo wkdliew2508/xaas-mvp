@@ -10,3 +10,12 @@ class IPORevivalScorer:
         }
         total = sum(signals.values())
         return total, signals
+
+# core/scorer.py
+
+def score_filing(filing):
+    # TODO: implement actual scoring logic
+    return {
+        "score": 75,
+        "notes": "Scored based on placeholder logic. Final logic pending."
+    }
