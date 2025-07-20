@@ -1,5 +1,5 @@
 import json
-import requests #(for test edgar api connection)
+import requests
 import os
 from datetime import datetime
 
@@ -8,8 +8,11 @@ LOG_PATH = "data/outreach_log.json"
 def load_outreach_log():
     if not os.path.exists(LOG_PATH):
         return {}
-    with open(LOG_PATH, "r") as f:
-        return json.load(f)
+    try:
+        with open(LOG_PATH, "r") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return {}
 
 def update_outreach_log(company):
     log = load_outreach_log()
@@ -34,29 +37,30 @@ def update_outcome(company, outcome):
         json.dump(log, f, indent=2)
 
 def compute_signal_deltas(leads):
-    # Dummy baseline for delta computation -- remove in demo/prod
+    # Dummy baseline for delta computation -- replace or remove in production
     previous_scores = {
         "Fictional Tech Co.": 65,
         "Future AI Ltd.": 58
     }
-    return {
-        lead["company"]: lead["score"] - previous_scores.get(lead["company"], lead["score"])
-        for lead in leads
-    }
+    deltas = {}
+    for lead in leads:
+        previous = previous_scores.get(lead["company"], lead["score"])
+        deltas[lead["company"]] = lead["score"] - previous
+    return deltas
 
-### function: asean_location -- for scraper.py #######
-def is_asean_location(location):
+def is_asean_location(location_string, selected_locations=None):
     asean_keywords = [
-        "Singapore", "Kuala Lumpur", "Jakarta", "Ho Chi Minh", "Hanoi", 
-        "Bangkok", "Manila", "Phnom Penh", "Vientiane", "Naypyidaw", 
+        "Singapore", "Kuala Lumpur", "Jakarta", "Ho Chi Minh", "Hanoi",
+        "Bangkok", "Manila", "Phnom Penh", "Vientiane", "Naypyidaw",
         "Bandar Seri Begawan", "Kwai Chung", "Wan Chai", "Hong Kong", "China"
     ]
-    return any(keyword.lower() in location.lower() for keyword in asean_keywords)
+    keywords = selected_locations if selected_locations else asean_keywords
+    return any(keyword.lower() in location_string.lower() for keyword in keywords)
 
-#### function: test_edgar_api_connection ####
-def test_edgar_api_connection():
+def test_edgar_api_connection(user_agent="YourApp/0.1 Contact@yourdomain.com"):
     try:
-        response = requests.get("https://data.sec.gov/submissions/CIK0000320193.json", headers={"User-Agent": "YourApp/0.1"})
+        headers = {"User-Agent": user_agent}
+        response = requests.get("https://data.sec.gov/submissions/CIK0000320193.json", headers=headers)
         if response.status_code == 200:
             return True, "Connected successfully to EDGAR API"
         else:
