@@ -57,6 +57,9 @@ def is_asean_location(location):
 def test_edgar_api_connection():
     try:
         response = requests.get("https://data.sec.gov/submissions/CIK0000320193.json", headers={"User-Agent": "YourApp/0.1"})
-        return response.status_code == 200
+        if response.status_code == 200:
+            return True, "Connected successfully to EDGAR API"
+        else:
+            return False, f"Connection failed with status code {response.status_code}"
     except Exception as e:
-        return False
+        return False, f"Connection error: {str(e)}"
