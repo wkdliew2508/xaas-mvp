@@ -21,3 +21,7 @@ Best regards,
 [Your Name]  
 CrossBorder Listings Team
         """
+
+# Add this function so app.py can import it
+def generate_outreach_message(lead, campaign=None):
+    return OutreachGenerator(campaign).generate(lead)
