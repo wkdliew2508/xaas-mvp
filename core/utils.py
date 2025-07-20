@@ -33,7 +33,7 @@ def update_outcome(company, outcome):
         json.dump(log, f, indent=2)
 
 def compute_signal_deltas(leads):
-    # Dummy baseline for delta computation
+    # Dummy baseline for delta computation -- remove in demo/prod
     previous_scores = {
         "Fictional Tech Co.": 65,
         "Future AI Ltd.": 58
@@ -42,3 +42,12 @@ def compute_signal_deltas(leads):
         lead["company"]: lead["score"] - previous_scores.get(lead["company"], lead["score"])
         for lead in leads
     }
+
+### function: asean_location -- for scraper.py #####
+def is_asean_location(location):
+    asean_keywords = [
+        "Singapore", "Kuala Lumpur", "Jakarta", "Ho Chi Minh", "Hanoi", 
+        "Bangkok", "Manila", "Phnom Penh", "Vientiane", "Naypyidaw", 
+        "Bandar Seri Begawan", "Kwai Chung", "Wan Chai", "Hong Kong", "China"
+    ]
+    return any(keyword.lower() in location.lower() for keyword in asean_keywords)
