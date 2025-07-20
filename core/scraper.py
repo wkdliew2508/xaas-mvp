@@ -7,11 +7,11 @@ class WithdrawnIPOScraper:
         self.base_url = "https://efts.sec.gov/LATEST/search-index"
         self.days_back = days_back
 
-    def get_withdrawn_ipos(self, start_date, end_date, selected_locations):
+    def fetch_data(self):
         query = {
             "keys": ["rw"],
-            "startdt": start_date.strftime("%Y-%m-%d"),
-            "enddt": end_date.strftime("%Y-%m-%d"),
+            "startdt": (datetime.today() - timedelta(days=self.days_back)).strftime("%Y-%m-%d"),
+            "enddt": datetime.today().strftime("%Y-%m-%d"),
             "category": "custom",
             "forms": ["RW"]
         }
@@ -19,38 +19,53 @@ class WithdrawnIPOScraper:
         headers = {
             "accept": "application/json",
             "Content-Type": "application/json",
-            "User-Agent": "YourName Contact@yourdomain.com"  # update this
+            "User-Agent": "XaaS-MVP/0.1 (contact: david@example.com)"
         }
 
         try:
             response = requests.post(self.base_url, json=query, headers=headers, timeout=10)
             response.raise_for_status()
             results = response.json().get("hits", {}).get("hits", [])
-            return self.filter_asean(results, selected_locations)
+            print(f"✅ Total filings fetched from EDGAR: {len(results)}")
+            filtered = self.filter_asean(results)
+            print(f"🌏 ASEAN-related filings: {len(filtered)}")
+            return filtered
+
         except requests.RequestException as e:
-            print(f"Error fetching EDGAR data: {e}")
+            print(f"❌ Error fetching EDGAR data: {e}")
             return []
 
-    def filter_asean(self, results, selected_locations):
+    def filter_asean(self, results):
         filtered = []
         for result in results:
             try:
-                source = result["_source"]
-                location = (
-                    source.get("filing_entity_city", "") + " " +
-                    source.get("filing_entity_state", "") + " " +
-                    source.get("filing_entity_country", "")
-                )
-
-                if is_asean_location(location, selected_locations):
+                location = result["_source"].get("filing_entity_city", "") + " " + \
+                           result["_source"].get("filing_entity_state", "") + " " + \
+                           result["_source"].get("filing_entity_country", "")
+                if is_asean_location(location):
                     filtered.append({
-                        "company_name": source.get("companyName", "N/A"),
-                        "form": source.get("formType", "RW"),
-                        "location": location.strip(),
-                        "filing_date": source.get("filedAt", ""),
-                        "industry": source.get("business", "N/A"),
-                        "filing_url": f"https://www.sec.gov/Archives/edgar/data/{source.get('cik', '')}/{result['_id']}.txt"
+                        "company": result["_source"].get("companyName", "N/A"),
+                        "form": result["_source"].get("formType", "RW"),
+                        "location": location,
+                        "filed": result["_source"].get("filedAt", ""),
+                        "cik": result["_source"].get("cik", ""),
+                        "accession_no": result["_id"]
                     })
             except Exception as e:
-                print(f"Error processing record: {e}")
+                print(f"⚠️ Error processing record: {e}")
         return filtered
+
+    def get_withdrawn_ipos(self, start_date, end_date, selected_locations):
+        all_filings = self.fetch_data()
+        print(f"📆 Filtering filings between {start_date} and {end_date} in locations: {selected_locations}")
+        results = []
+        for f in all_filings:
+            try:
+                filed_date = datetime.strptime(f["filed"][:10], "%Y-%m-%d").date()
+                if start_date <= filed_date <= end_date:
+                    if any(loc.lower() in f["location"].lower() for loc in selected_locations):
+                        results.append(f)
+            except Exception as e:
+                print(f"⚠️ Date/location filter error: {e}")
+        print(f"✅ Final matching results: {len(results)}")
+        return results
