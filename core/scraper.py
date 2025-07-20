@@ -52,11 +52,16 @@ class WithdrawnIPOScraper:
                 print(f"Error processing record: {e}")
         return filtered
 
-####### ORIG ##########
-#class WithdrawnIPOScraper:
-#    def scrape(self):
-#        # Placeholder static list
-#        return [
-#            {"company": "Fictional Tech Co.", "country": "Singapore", "peer_ipo": True, "funding": True, "ceo_change": False},
-#            {"company": "Future AI Ltd.", "country": "India", "peer_ipo": False, "funding": False, "ceo_change": True},
-#        ]
+    def get_withdrawn_ipos(self, start_date, end_date, selected_locations):
+        all_filings = self.fetch_data()
+        # Optionally filter by user-defined date range and locations
+        results = []
+        for f in all_filings:
+            try:
+                filed_date = datetime.strptime(f["filed"][:10], "%Y-%m-%d").date()
+                if start_date <= filed_date <= end_date:
+                    if any(loc.lower() in f["location"].lower() for loc in selected_locations):
+                        results.append(f)
+            except Exception as e:
+                print(f"Date/location filter error: {e}")
+        return results

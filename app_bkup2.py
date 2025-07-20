@@ -48,14 +48,13 @@ if st.button("🔍 Run Search"):
     if results:
         st.markdown("## 🎯 Filtered IPO Revival Targets")
         for r in results:
-            with st.expander(f"{r['company']} ({r['filed']}) - Score: {r['score']}"):
+            with st.expander(f"{r['company_name']} ({r['filing_date']}) - Score: {r['score']}"):
                 st.write(f"**Location:** {r['location']}")
-                st.write(f"**Form Type:** {r['form']}")
+                st.write(f"**Industry:** {r['industry']}")
                 st.write(f"**Tags:** {r['tags']}")
-                filing_url = f"https://www.sec.gov/Archives/edgar/data/{r['cik']}/{r['accession_no'].replace('-', '')}/{r['accession_no']}-index.htm"
-                st.write(f"**Filing URL:** [{filing_url}]({filing_url})")
+                st.write(f"**Filing URL:** [{r['filing_url']}]({r['filing_url']})")
                 st.text_area("✉️ Outreach Message", r['outreach'])
-                if st.button("📤 Send Outreach", key=r['company']):
+                if st.button("📤 Send Outreach", key=r['company_name']):
                     st.success("Outreach sent and logged.")
     else:
         st.warning("No IPO withdrawal filings matched your filters.")
