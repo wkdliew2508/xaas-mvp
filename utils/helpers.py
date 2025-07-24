@@ -50,6 +50,18 @@ def extract_filing_details(filing_url: str) -> dict:
 
     return details
 
+def fetch_stockanalysis_data():
+    # Dummy structure, assumes export from scraped table or internal cache
+    data = [
+        {"Company Name": "Test Holdings Ltd", "Country": "Singapore", "Status": "Withdrawn"},
+        {"Company Name": "Alpha Asia Corp", "Country": "China", "Status": "Withdrawn"}
+    ]
+    return pd.DataFrame(data)
+
+def get_stockanalysis_df():
+    return fetch_stockanalysis_data()
+
+
 def combine_sources(edgar_df, stock_df):
     """
     Merge or concatenate EDGAR and StockAnalysis datasets.
