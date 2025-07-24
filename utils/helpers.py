@@ -51,12 +51,28 @@ def extract_filing_details(filing_url: str) -> dict:
     return details
 
 def fetch_stockanalysis_data():
-    # Dummy structure, assumes export from scraped table or internal cache
-    data = [
-        {"Company Name": "Test Holdings Ltd", "Country": "Singapore", "Status": "Withdrawn"},
-        {"Company Name": "Alpha Asia Corp", "Country": "China", "Status": "Withdrawn"}
-    ]
-    return pd.DataFrame(data)
+    """
+    Scrape withdrawn IPOs from stockanalysis.com and return as DataFrame.
+    """
+    url = "https://stockanalysis.com/ipos/withdrawn/"
+    try:
+        tables = pd.read_html(url)
+        df = tables[0]  # The first table on the page is the withdrawn IPOs
+
+        # Optional cleaning
+        df = df.rename(columns={
+            "Company": "Company Name",
+            "Symbol": "Ticker",
+            "Country": "Country",
+            "Withdrawn": "Withdrawn Date"
+        })
+
+        df["Status"] = "Withdrawn"
+        return df
+
+    except Exception as e:
+        print(f"Error scraping StockAnalysis: {e}")
+        return pd.DataFrame(columns=["Company Name", "Country", "Status"])
 
 def get_stockanalysis_df():
     return fetch_stockanalysis_data()
