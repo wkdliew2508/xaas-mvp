@@ -80,7 +80,7 @@ def fetch_stockanalysis_data():
             if len(cols) == len(headers):
                 data.append(dict(zip(headers, cols)))
 
-         df = pd.DataFrame(data)
+        df = pd.DataFrame(data)
         print("StockAnalysis columns:", df.columns.tolist())
 
         # Rename columns if they exist:
