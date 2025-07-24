@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import time
-from utils import extract_filing_details
+from utils.helpers import extract_filing_details
 
 location_codes = {
     "Singapore": "U0",

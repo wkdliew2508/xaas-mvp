@@ -1,6 +1,54 @@
 # File: utils/helpers.py
 
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+def extract_filing_details(filing_url: str) -> dict:
+    """
+    Given a filing URL from EDGAR, extract relevant details such as
+    reason for withdrawal, undersigned name/title, and possible contact info.
+    """
+    details = {
+        "Reason": "",
+        "Undersigned": "",
+        "Contact": ""
+    }
+
+    try:
+        response = requests.get(filing_url, headers={"User-Agent": "Mozilla/5.0"})
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        text = soup.get_text(separator="\n")
+
+        # Extract Reason for Withdrawal
+        reason_keywords = ["reason for withdrawal", "withdraw its registration", "has determined not to proceed"]
+        for line in text.splitlines():
+            if any(kw.lower() in line.lower() for kw in reason_keywords):
+                details["Reason"] = line.strip()
+                break
+
+        # Extract Undersigned name and title
+        sig_block = []
+        for line in reversed(text.splitlines()):
+            if "By:" in line or "Name:" in line or "Title:" in line:
+                sig_block.insert(0, line.strip())
+            if len(sig_block) > 3:
+                break
+        details["Undersigned"] = " / ".join(sig_block)
+
+        # Attempt to find email or LinkedIn (less common)
+        if "@" in text:
+            contact_lines = [line.strip() for line in text.splitlines() if "@" in line]
+            details["Contact"] = contact_lines[0] if contact_lines else ""
+        elif "linkedin.com/in/" in text:
+            contact_lines = [line.strip() for line in text.splitlines() if "linkedin.com/in/" in line]
+            details["Contact"] = contact_lines[0] if contact_lines else ""
+
+    except Exception as e:
+        details["Reason"] = f"[Error parsing filing: {e}]"
+
+    return details
 
 def combine_sources(edgar_df, stock_df):
     """
