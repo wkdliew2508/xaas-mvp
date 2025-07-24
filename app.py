@@ -10,6 +10,8 @@ from scraper.scraper import get_withdrawn_ipos
 from utils.formatter import format_filing_data
 from utils.helpers import get_stockanalysis_df, combine_sources
 
+stockanalysis_df = get_stockanalysis_df()
+
 st.set_page_config(page_title="Withdrawn IPO Intelligence", layout="wide")
 st.title("📉 Withdrawn IPO Intelligence Dashboard")
 

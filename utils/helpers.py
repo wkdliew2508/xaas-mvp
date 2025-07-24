@@ -52,20 +52,41 @@ def extract_filing_details(filing_url: str) -> dict:
 
 def fetch_stockanalysis_data():
     """
-    Scrape withdrawn IPOs from stockanalysis.com and return as DataFrame.
+    Scrapes withdrawn IPOs from stockanalysis.com using requests + BeautifulSoup
+    and returns a cleaned pandas DataFrame.
     """
     url = "https://stockanalysis.com/ipos/withdrawn/"
-    try:
-        tables = pd.read_html(url)
-        df = tables[0]  # The first table on the page is the withdrawn IPOs
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/115.0.0.0 Safari/537.36"
+    }
 
-        # Optional cleaning
-        df = df.rename(columns={
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        table = soup.find("table")
+        if not table:
+            raise ValueError("No table found on the page")
+
+        rows = table.find_all("tr")
+        data = []
+        headers = [th.text.strip() for th in rows[0].find_all("th")]
+
+        for row in rows[1:]:
+            cols = [td.text.strip() for td in row.find_all("td")]
+            if len(cols) == len(headers):
+                data.append(dict(zip(headers, cols)))
+
+        df = pd.DataFrame(data)
+        df.rename(columns={
             "Company": "Company Name",
             "Symbol": "Ticker",
             "Country": "Country",
             "Withdrawn": "Withdrawn Date"
-        })
+        }, inplace=True)
 
         df["Status"] = "Withdrawn"
         return df
