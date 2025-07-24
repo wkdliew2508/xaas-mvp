@@ -12,8 +12,6 @@ from utils.helpers import get_stockanalysis_df, combine_sources
 
 stockanalysis_df = get_stockanalysis_df()
 
-combined = combine_sources(edgar_df, stock_df)
-
 st.markdown("## Combined Withdrawn IPOs")
 
 if 'Country' in combined.columns and not combined.empty:
@@ -43,7 +41,7 @@ if run_search:
     edgar_df = pd.DataFrame(edgar_list)
     stock_df = get_stockanalysis_df()
     combined = combine_sources(edgar_df, stock_df)
-    
+
     st.markdown("## Combined Withdrawn IPOs")
     for country in combined['Country'].unique():
         df_country = combined[combined['Country'] == country].reset_index(drop=True)
