@@ -1,5 +1,9 @@
 # File: app.py
 
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+
 import streamlit as st
 import pandas as pd
 from scraper.scraper import get_withdrawn_ipos
