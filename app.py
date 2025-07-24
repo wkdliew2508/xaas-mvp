@@ -12,6 +12,18 @@ from utils.helpers import get_stockanalysis_df, combine_sources
 
 stockanalysis_df = get_stockanalysis_df()
 
+combined = combine_sources(edgar_df, stock_df)
+
+st.markdown("## Combined Withdrawn IPOs")
+
+if 'Country' in combined.columns and not combined.empty:
+    for country in combined['Country'].unique():
+        df_country = combined[combined['Country'] == country].reset_index(drop=True)
+        st.markdown(f"### {country}")
+        st.dataframe(df_country)
+else:
+    st.warning("No country data found to display IPOs by country.")
+
 st.set_page_config(page_title="Withdrawn IPO Intelligence", layout="wide")
 st.title("📉 Withdrawn IPO Intelligence Dashboard")
 

@@ -80,12 +80,19 @@ def fetch_stockanalysis_data():
             if len(cols) == len(headers):
                 data.append(dict(zip(headers, cols)))
 
-        df = pd.DataFrame(data)
+         df = pd.DataFrame(data)
+        print("StockAnalysis columns:", df.columns.tolist())
+
+        # Rename columns if they exist:
+        if "Country" not in df.columns:
+            # Optionally infer or add 'Country' here if possible, e.g. default to empty string or None
+            df["Country"] = ""
+
         df.rename(columns={
             "Company": "Company Name",
             "Symbol": "Ticker",
-            "Country": "Country",
-            "Withdrawn": "Withdrawn Date"
+            "Withdrawn": "Withdrawn Date",
+            # keep 'Country' as is or add if missing
         }, inplace=True)
 
         df["Status"] = "Withdrawn"
