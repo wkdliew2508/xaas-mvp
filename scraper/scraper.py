@@ -32,10 +32,10 @@ def get_withdrawn_ipos(start_date, end_date):
         payload = {
             "keys": ["RW"],  # Withdrawn forms
             "category": "custom",
-            "forms": ["RW", "RW WD"],
+            "forms": ["RW"], #"forms": ["RW", "RW WD"],
             "startdt": str(start_date),
             "enddt": str(end_date),
-            "location": location_code
+           #  "location": location_code # <-- Temporarily comment out
         }
 
         try:
