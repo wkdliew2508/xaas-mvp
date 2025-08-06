@@ -18,7 +18,7 @@ location_codes = {
 
 # Required user-agent format for SEC.gov per their fair access policy
 headers = {
-    'User-Agent': 'AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)'
+    'User-Agent': 'AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)',
     'Accept-Encoding': 'gzip, deflate',
     'Host': 'efts.sec.gov',
     'Content-Type': 'application/json'
