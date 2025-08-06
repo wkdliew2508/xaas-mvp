@@ -5,10 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 
 def extract_filing_details(filing_url: str) -> dict:
-    """
-    Given an EDGAR filing index URL, follow links to extract the actual
-    filing text and parse out the reason for withdrawal and signer info.
-    """
     details = {
         "Reason": "",
         "Undersigned": "",
@@ -16,31 +12,35 @@ def extract_filing_details(filing_url: str) -> dict:
     }
 
     try:
+        print(f"[DEBUG] Accessing filing index URL: {filing_url}")
         index_page = requests.get(filing_url, headers={"User-Agent": "Mozilla/5.0"})
         index_page.raise_for_status()
         soup = BeautifulSoup(index_page.text, "html.parser")
 
-        # Step 1: Find the actual filing document link (.htm or .txt)
         doc_table = soup.find("table", class_="tableFile")
-        filing_doc_url = None
+        if not doc_table:
+            print("[DEBUG] No document table found.")
+        else:
+            print("[DEBUG] Document table found.")
 
+        filing_doc_url = None
         if doc_table:
-            for row in doc_table.find_all("tr")[1:]:  # skip header
+            for row in doc_table.find_all("tr")[1:]:
                 cols = row.find_all("td")
                 if len(cols) >= 3 and "complete submission text" in cols[2].text.lower():
                     filing_doc_url = "https://www.sec.gov" + cols[2].a['href']
+                    print(f"[DEBUG] Found complete submission text URL: {filing_doc_url}")
                     break
                 elif len(cols) >= 3 and (".htm" in cols[2].text or ".txt" in cols[2].text):
                     filing_doc_url = "https://www.sec.gov" + cols[2].a['href']
+                    print(f"[DEBUG] Found fallback filing URL: {filing_doc_url}")
                     break
 
-        # Step 2: If found, fetch the full filing document text
         if filing_doc_url:
             filing_resp = requests.get(filing_doc_url, headers={"User-Agent": "Mozilla/5.0"})
             filing_resp.raise_for_status()
             text = BeautifulSoup(filing_resp.text, "html.parser").get_text(separator="\n")
 
-            # Step 3: Try to extract the reason
             reason_keywords = [
                 "reason for withdrawal", 
                 "has determined not to proceed", 
@@ -52,9 +52,9 @@ def extract_filing_details(filing_url: str) -> dict:
             for line in text.splitlines():
                 if any(kw in line.lower() for kw in reason_keywords):
                     details["Reason"] = line.strip()
+                    print(f"[DEBUG] Found Reason: {details['Reason']}")
                     break
 
-            # Step 4: Extract signer info
             sig_block = []
             for line in reversed(text.splitlines()):
                 if "By:" in line or "Name:" in line or "Title:" in line:
@@ -63,17 +63,20 @@ def extract_filing_details(filing_url: str) -> dict:
                     break
             if sig_block:
                 details["Undersigned"] = " / ".join(sig_block)
+                print(f"[DEBUG] Found Signer Block: {details['Undersigned']}")
 
-            # Step 5: Try to find email or LinkedIn contact
             contact_lines = [line.strip() for line in text.splitlines() if "@" in line or "linkedin.com/in/" in line]
             if contact_lines:
                 details["Contact"] = contact_lines[0]
+                print(f"[DEBUG] Found Contact: {details['Contact']}")
 
         else:
             details["Reason"] = "[Filing document not found on index page]"
+            print("[DEBUG] Filing document link not found.")
 
     except Exception as e:
         details["Reason"] = f"[Error extracting filing details: {e}]"
+        print(f"[ERROR] Exception during extract_filing_details: {e}")
 
     return details
 

@@ -13,6 +13,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 from scraper.scraper import get_withdrawn_ipos
 from utils.formatter import format_filing_data
 from utils.helpers import get_stockanalysis_df, combine_sources
+from datetime import datetime
 
 st.set_page_config(page_title="Withdrawn IPO Intelligence", layout="wide")
 
@@ -25,8 +26,8 @@ focusing on Singapore, Hong Kong, and China.
 
 with st.sidebar:
     st.header("🔍 Search Parameters")
-    start_date = st.date_input("Start Date")
-    end_date = st.date_input("End Date")
+    start_date = st.date_input("Start date").strftime("%Y-%m-%d")
+    end_date = st.date_input("End date").strftime("%Y-%m-%d")
     run_search = st.button("Run Search")
 
 if run_search:
