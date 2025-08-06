@@ -18,10 +18,11 @@ location_codes = {
 
 # Required user-agent format for SEC.gov per their fair access policy
 headers = {
-    'User-Agent': 'AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)',
-    'Accept-Encoding': 'gzip, deflate',
-    'Host': 'efts.sec.gov',
-    'Content-Type': 'application/json'
+    "User-Agent": "AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)",
+    "Accept-Encoding": "gzip, deflate",
+    "Host": "efts.sec.gov",
+    "Accept": "*/*",
+    "Connection": "keep-alive"
 }
 
 def get_withdrawn_ipos(start_date, end_date):
@@ -43,8 +44,13 @@ def get_withdrawn_ipos(start_date, end_date):
             "location": location_code
         }
 
+        # Debug
+        print(f"Searching {country} [{location_code}] from {start_date} to {end_date}")
+        print("Payload:", payload)
+        print("Headers:", headers)
+
         try:
-            response = requests.post(url, headers=headers, json=payload) #(search_url, headers=headers, json=payload)
+            response = requests.post(search_url, headers=headers, json=payload)
             response.raise_for_status()
             filings = response.json().get("hits", [])
 
@@ -79,7 +85,15 @@ def get_withdrawn_ipos(start_date, end_date):
 
         except Exception as e:
             print(f"[!] Error fetching for {country}: {e}")
+            if 'response' in locals() and response is not None:
+                print("Response text:", response.text)
             continue
 
     print(f"[✓] Total EDGAR filings fetched: {len(results)}")
     return results
+
+if __name__ == "__main__":
+    test_data = get_withdrawn_ipos(start_date="2024-08-01", end_date="2025-08-01")
+    print(f"Fetched {len(test_data)} filings")
+    for item in test_data[:5]:  # Show first 5
+        print(item)
