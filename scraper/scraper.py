@@ -57,9 +57,17 @@ def get_withdrawn_ipos(start_date, end_date):
                 # EDGAR URLs require formatting the accession string
                 accession_nodash = accession.replace("-", "")
                 filing_url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{accession_nodash}/{accession}-index.htm"
+                print(f"[→] Fetching filing: {filing_url}")
 
+                    #debug for CIK and Accesion
+                    print(f"CIK: {cik}, Accession: {accession}, Filing URL: {filing_url}")
+                
+                try:
                 # Extract additional detail from filing document
                 filing_details = extract_filing_details(filing_url)
+                except Exception as e:
+                    print(f"[!] Error extracting details: {e}")
+                    filing_details = {"Details": "Error extracting"}
 
                 # Construct the full result
                 filing_details.update({
@@ -77,7 +85,7 @@ def get_withdrawn_ipos(start_date, end_date):
             print(f"[!] Error fetching for {country}: {e}")
             continue
             #adding debug prints
-            print(f"Found {len(filings)} filings for {country}")
-            print(f"Total EDGAR filings fetched: {len(results)}")
-
+            #print(f"Found {len(filings)} filings for {country}")
+            #print(f"Total EDGAR filings fetched: {len(results)}")
+    print(f"[✓] Total EDGAR filings fetched: {len(results)}")
     return results
