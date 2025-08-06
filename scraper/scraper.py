@@ -18,11 +18,11 @@ location_codes = {
 
 # Required user-agent format for SEC.gov per their fair access policy
 headers = {
-    "User-Agent": "AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)",
-    "Accept-Encoding": "gzip, deflate",
-    "Host": "efts.sec.gov",
-    "Accept": "*/*",
-    "Connection": "keep-alive"
+    "User-Agent": "AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)" #remove comma
+    #"Accept-Encoding": "gzip, deflate",
+    #"Host": "efts.sec.gov",
+    #"Accept": "*/*",
+    #"Connection": "keep-alive"
 }
 
 def get_withdrawn_ipos(start_date, end_date):
@@ -41,7 +41,7 @@ def get_withdrawn_ipos(start_date, end_date):
             "forms": ["RW", "RW WD"],
             "startdt": str(start_date),
             "enddt": str(end_date),
-            "location": location_code
+            #"location": location_code <-- temporary remove location
         }
 
         # Debug
