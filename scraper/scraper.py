@@ -1,5 +1,7 @@
 # File: scraper/scraper.py
 
+import sys, os
+print(sys.path)
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -17,6 +19,9 @@ location_codes = {
 # Required user-agent format for SEC.gov per their fair access policy
 headers = {
     'User-Agent': 'AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)'
+    'Accept-Encoding': 'gzip, deflate',
+    'Host': 'efts.sec.gov',
+    'Content-Type': 'application/json'
 }
 
 def get_withdrawn_ipos(start_date, end_date):
@@ -39,7 +44,7 @@ def get_withdrawn_ipos(start_date, end_date):
         }
 
         try:
-            response = requests.post(search_url, headers=headers, json=payload)
+            response = requests.post(url, headers=headers, json=payload) #(search_url, headers=headers, json=payload)
             response.raise_for_status()
             filings = response.json().get("hits", [])
 
