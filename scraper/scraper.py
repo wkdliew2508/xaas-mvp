@@ -76,5 +76,8 @@ def get_withdrawn_ipos(start_date, end_date):
         except Exception as e:
             print(f"[!] Error fetching for {country}: {e}")
             continue
+            #adding debug prints
+            print(f"Found {len(filings)} filings for {country}")
+            print(f"Total EDGAR filings fetched: {len(results)}")
 
     return results
