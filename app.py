@@ -6,6 +6,9 @@ sys.path.append(os.path.dirname(__file__))
 
 import streamlit as st
 import pandas as pd
+import openai
+
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 from scraper.scraper import get_withdrawn_ipos
 from utils.formatter import format_filing_data
@@ -37,8 +40,8 @@ if run_search:
 
         st.success("Data fetched and processed successfully!")
 
-    if 'Country' in combined_df.columns and not combined_df.empty:
-        st.markdown("## Combined Withdrawn IPOs")
+    if not combined_df.empty and 'Country' in combined_df.columns:
+        st.markdown("## 📊 Withdrawn IPOs by Country")
         for country in combined_df['Country'].unique():
             df_country = combined_df[combined_df['Country'] == country].reset_index(drop=True)
             st.markdown(f"### {country}")
