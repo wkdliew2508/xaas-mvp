@@ -16,7 +16,7 @@ location_codes = {
 
 # Required user-agent format for SEC.gov per their fair access policy
 headers = {
-    'User-Agent': 'MyCompanyName XaaS-MVP/1.0 (contact@mycompany.com)'
+    'User-Agent': 'AtasSuccess-XaaS-MVP/1.0 (wkdliew@gmail.com)'
 }
 
 def get_withdrawn_ipos(start_date, end_date):
