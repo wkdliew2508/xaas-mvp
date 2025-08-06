@@ -32,10 +32,10 @@ def get_withdrawn_ipos(start_date, end_date):
         payload = {
             "keys": ["RW"],  # Withdrawn forms
             "category": "custom",
-            "forms": ["RW"], #"forms": ["RW", "RW WD"],
+            "forms": ["RW", "RW WD"],
             "startdt": str(start_date),
             "enddt": str(end_date),
-           #  "location": location_code # <-- Temporarily comment out
+            "location": location_code
         }
 
         try:
@@ -54,22 +54,13 @@ def get_withdrawn_ipos(start_date, end_date):
                 if not (cik and accession):
                     continue  # Skip incomplete records
 
-                # EDGAR URLs require formatting the accession string
                 accession_nodash = accession.replace("-", "")
                 filing_url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{accession_nodash}/{accession}-index.htm"
-                print(f"[→] Fetching filing: {filing_url}")
 
-                    #debug for CIK and Accesion
-                    #print(f"CIK: {cik}, Accession: {accession}, Filing URL: {filing_url}")
-                
-                try:
-                # Extract additional detail from filing document
+                print(f"CIK: {cik}, Accession: {accession}, Filing URL: {filing_url}")
+
                 filing_details = extract_filing_details(filing_url)
-                except Exception as e:
-                    print(f"[!] Error extracting details: {e}")
-                    filing_details = {"Details": "Error extracting"}
 
-                # Construct the full result
                 filing_details.update({
                     "Company Name": name,
                     "CIK": cik,
@@ -84,8 +75,6 @@ def get_withdrawn_ipos(start_date, end_date):
         except Exception as e:
             print(f"[!] Error fetching for {country}: {e}")
             continue
-            #adding debug prints
-            #print(f"Found {len(filings)} filings for {country}")
-            #print(f"Total EDGAR filings fetched: {len(results)}")
+
     print(f"[✓] Total EDGAR filings fetched: {len(results)}")
     return results
