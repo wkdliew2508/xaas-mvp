@@ -60,7 +60,7 @@ def get_withdrawn_ipos(start_date, end_date):
                 print(f"[→] Fetching filing: {filing_url}")
 
                     #debug for CIK and Accesion
-                    print(f"CIK: {cik}, Accession: {accession}, Filing URL: {filing_url}")
+                    #print(f"CIK: {cik}, Accession: {accession}, Filing URL: {filing_url}")
                 
                 try:
                 # Extract additional detail from filing document
